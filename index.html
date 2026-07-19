@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SI-INTELPOL — prototipe dashboard intelijen kepolisian terintegrasi (UI/UX konsep, data simulasi)." />
+  <title>SI-INTELPOL | Dashboard Intelijen Kepolisian</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23081727'/%3E%3Ctext x='32' y='42' font-family='Segoe UI,Arial,sans-serif' font-size='28' font-weight='700' fill='%2329d7ff' text-anchor='middle'%3ESI%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">SI</div>
+        <div>
+          <h1>SI-INTELPOL</h1>
+          <span>Integrated Intelligence</span>
+        </div>
+      </div>
+
+      <nav class="nav" id="navMenu"></nav>
+
+      <div class="system-mini">
+        <div class="mini-row"><span class="pulse green"></span><span>Status Sistem</span><b>Aman</b></div>
+        <div class="mini-row"><span class="pulse cyan"></span><span>Koneksi</span><b>Terhubung</b></div>
+        <div class="mini-row"><span class="pulse amber"></span><span>Mode</span><b>Simulasi</b></div>
+        <small>Ver. 1.0.0 • Prototype</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-button mobile-toggle" id="mobileToggle">☰</button>
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input id="globalSearch" type="search" placeholder="Cari laporan, wilayah, kategori, entitas, atau kata kunci..." />
+        </div>
+        <div class="top-actions">
+          <div class="datetime">
+            <small id="dateText">Jumat, 3 Juli 2026</small>
+            <strong id="timeText">00:00:00 WIB</strong>
+          </div>
+          <button class="icon-button badge" title="Notifikasi">🔔<span>12</span></button>
+          <button class="icon-button" title="Pesan">✉</button>
+          <div class="profile">
+            <div class="avatar">A</div>
+            <div>
+              <strong>Admin Intelijen</strong>
+              <small>Administrator</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="content-header">
+        <div>
+          <p class="eyebrow" id="pageEyebrow">Command Center</p>
+          <h2 id="pageTitle">Beranda</h2>
+        </div>
+        <div class="quick-actions">
+          <button class="btn ghost">Export Ringkas</button>
+          <button class="btn primary">+ Laporan Baru</button>
+        </div>
+      </section>
+
+      <section class="page-content" id="pageContent"></section>
+    </main>
+  </div>
+
+  <template id="chartTemplate">
+    <svg viewBox="0 0 600 220" class="line-chart" aria-label="Grafik tren laporan">
+      <defs>
+        <linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="rgba(64, 156, 255, .42)"/>
+          <stop offset="100%" stop-color="rgba(64, 156, 255, 0)"/>
+        </linearGradient>
+      </defs>
+      <path class="grid-line" d="M45 30 H575 M45 75 H575 M45 120 H575 M45 165 H575" />
+      <path class="area" d="M45 162 L110 104 L175 132 L240 76 L305 144 L370 111 L435 84 L500 126 L575 70 L575 190 L45 190 Z" />
+      <path class="line" d="M45 162 L110 104 L175 132 L240 76 L305 144 L370 111 L435 84 L500 126 L575 70" />
+      <g class="dots">
+        <circle cx="45" cy="162" r="5"/><circle cx="110" cy="104" r="5"/><circle cx="175" cy="132" r="5"/><circle cx="240" cy="76" r="5"/><circle cx="305" cy="144" r="5"/><circle cx="370" cy="111" r="5"/><circle cx="435" cy="84" r="5"/><circle cx="500" cy="126" r="5"/><circle cx="575" cy="70" r="5"/>
+      </g>
+      <text x="45" y="214">24 Jun</text><text x="155" y="214">26 Jun</text><text x="270" y="214">28 Jun</text><text x="385" y="214">30 Jun</text><text x="520" y="214">2 Jul</text>
+    </svg>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
