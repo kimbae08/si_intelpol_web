@@ -42,6 +42,14 @@ python3 -m http.server 8080
 npx serve .
 ```
 
+## 🔑 Kode akses
+
+Halaman dibuka dengan gerbang kode akses: **`mlebubae`**.
+
+> ⚠️ Gerbang ini **kosmetik sisi-client** untuk prototype (data simulasi) — bukan
+> keamanan sungguhan. Karena repo/situs bersifat publik, kode sumber dapat dilihat
+> siapa saja dan gerbang dapat dilewati. Jangan gunakan untuk data operasional nyata.
+
 ## 🧭 Routing
 
 Navigasi memakai **hash routing** (`index.html#peta`, `#kriminal`, dst.), sehingga:

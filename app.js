@@ -477,9 +477,55 @@ function bindSearch() {
 window.addEventListener('resize', () => setTimeout(initCanvases, 100));
 document.getElementById('mobileToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
-buildNav();
-window.addEventListener('hashchange', route);
-route();
-updateClock();
-setInterval(updateClock, 1000);
-bindSearch();
+// Kode akses hanya gerbang kosmetik sisi-client untuk prototype (data simulasi).
+// Bukan keamanan sungguhan: kode sumber terlihat publik. Jangan pakai untuk data nyata.
+const ACCESS_CODE = 'mlebubae';
+const AUTH_KEY = 'si-intelpol-auth';
+
+let appStarted = false;
+function startApp() {
+  if (appStarted) return;
+  appStarted = true;
+  buildNav();
+  window.addEventListener('hashchange', route);
+  route();
+  updateClock();
+  setInterval(updateClock, 1000);
+  bindSearch();
+}
+
+function unlock(gate) {
+  sessionStorage.setItem(AUTH_KEY, '1');
+  gate.classList.add('hidden');
+  startApp();
+}
+
+function initAuthGate() {
+  const gate = document.getElementById('authGate');
+  const form = document.getElementById('authForm');
+  const card = form.querySelector('.auth-card');
+  const codeInput = document.getElementById('authCode');
+  const errorText = document.getElementById('authError');
+
+  if (sessionStorage.getItem(AUTH_KEY) === '1') {
+    unlock(gate);
+    return;
+  }
+
+  codeInput.focus();
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (codeInput.value.trim().toLowerCase() === ACCESS_CODE) {
+      errorText.textContent = '';
+      unlock(gate);
+    } else {
+      errorText.textContent = 'Kode akses salah. Coba lagi.';
+      card.classList.remove('shake');
+      void card.offsetWidth; // reflow agar animasi bisa diputar ulang
+      card.classList.add('shake');
+      codeInput.select();
+    }
+  });
+}
+
+initAuthGate();

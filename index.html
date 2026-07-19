@@ -9,6 +9,18 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="auth-gate" id="authGate">
+    <form class="auth-card" id="authForm" autocomplete="off">
+      <div class="auth-logo">SI</div>
+      <h1>SI-INTELPOL</h1>
+      <p>Masukkan kode akses untuk membuka dashboard prototipe.</p>
+      <input id="authCode" type="password" inputmode="text" placeholder="Kode akses" aria-label="Kode akses" autocomplete="off" />
+      <button type="submit" class="btn primary auth-submit">Masuk</button>
+      <span class="auth-error" id="authError" role="alert"></span>
+      <small>Prototype • data simulasi</small>
+    </form>
+  </div>
+
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
