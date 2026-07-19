@@ -24,17 +24,17 @@ const latest = [
 ];
 
 const intelRows = [
-  ['INT-2026-0703-001','03 Jul 2026 10:15','Manggarai','Potensi Tawuran','A2','Tinggi','Perlu Verifikasi'],
-  ['INT-2026-0703-002','03 Jul 2026 09:12','Kebayoran Baru','Isu Unjuk Rasa','B1','Sedang','Monitoring'],
-  ['INT-2026-0702-014','02 Jul 2026 22:30','Cilandak','Peredaran Narkoba','A1','Tinggi','Terverifikasi'],
-  ['INT-2026-0701-033','01 Jul 2026 18:45','Pasar Minggu','Konflik Warga','B2','Sedang','Dipantau'],
+  ['INT-2026-0703-001','03 Jul 2026 10:15','Sanggau, Kalbar','Aktivitas Lintas Batas','A2','Tinggi','Perlu Verifikasi'],
+  ['INT-2026-0703-002','03 Jul 2026 09:47','DKI Jakarta','Potensi Unjuk Rasa','B1','Sedang','Monitoring'],
+  ['INT-2026-0702-014','02 Jul 2026 22:30','Poso, Sulteng','Kelompok Bersenjata','A1','Tinggi','Terverifikasi'],
+  ['INT-2026-0701-033','01 Jul 2026 18:45','Ternate, Malut','Konflik Horizontal','B2','Sedang','Dipantau'],
 ];
 
 const crimeRows = [
-  ['LP-2026-0703-009','03 Jul 2026 09:40','Kebayoran Lama','Curanmor','Reskrim','Lidik','Terkait Intelijen 62%'],
-  ['LP-2026-0703-004','03 Jul 2026 01:20','Tebet','Penganiayaan','Polsek Tebet','Sidik','Tidak Terkait'],
-  ['LP-2026-0702-021','02 Jul 2026 23:10','Manggarai','Tawuran','Sabhara','Selesai','Terkait Intelijen 86%'],
-  ['LP-2026-0701-011','01 Jul 2026 20:05','Cilandak','Narkoba','Satnarkoba','Sidik','Terkait Intelijen 77%'],
+  ['LP-2026-0703-009','03 Jul 2026 09:40','Deli Serdang, Sumut','Curanmor','Reskrim','Lidik','Terkait Intelijen 62%'],
+  ['LP-2026-0703-004','03 Jul 2026 01:20','Surabaya, Jatim','Penganiayaan','Polrestabes','Sidik','Tidak Terkait'],
+  ['LP-2026-0702-021','02 Jul 2026 23:10','Jayapura, Papua','Gangguan Kamtibmas','Sabhara','Selesai','Terkait Intelijen 86%'],
+  ['LP-2026-0701-011','01 Jul 2026 20:05','Makassar, Sulsel','Narkoba','Satnarkoba','Sidik','Terkait Intelijen 77%'],
 ];
 
 const timeline = [
@@ -46,18 +46,18 @@ const timeline = [
 ];
 
 const areaData = [
-  ['Manggarai','Kritis','Skor 89 • Tawuran, penganiayaan, laporan warga tinggi','92'],
-  ['Cilandak','Tinggi','Skor 78 • Narkoba, curanmor, laporan intelijen aktif','78'],
-  ['Kebayoran Lama','Tinggi','Skor 74 • Curanmor dan pergerakan malam meningkat','74'],
-  ['Pasar Minggu','Sedang','Skor 58 • Konflik warga dan balap liar','58'],
-  ['Tebet','Sedang','Skor 55 • Penganiayaan dan keributan lokal','55'],
+  ['Papua','Kritis','Skor 92 • Gangguan keamanan, kontak senjata, laporan intelijen tinggi','92'],
+  ['Kalimantan Barat','Tinggi','Skor 84 • Aktivitas lintas batas dan penyelundupan','84'],
+  ['Poso, Sulteng','Tinggi','Skor 78 • Jejak kelompok bersenjata dan propaganda','78'],
+  ['Maluku Utara','Sedang','Skor 62 • Konflik horizontal dan isu SARA','62'],
+  ['DKI Jakarta','Sedang','Skor 58 • Potensi unjuk rasa dan kerawanan siber','58'],
 ];
 
 const units = [
-  ['Patroli 01','Menuju TKP Manggarai','ETA 07 menit','Tinggi'],
-  ['Reskrim 03','Olah TKP Kebayoran Lama','Aktif','Sedang'],
-  ['Intel 02','Monitoring Cilandak','Aktif','Tinggi'],
-  ['Sabhara 05','Patroli preventif Tebet','Siaga','Rendah'],
+  ['Satgas Papua 01','Patroli perbatasan Skouw','ETA 09 menit','Tinggi'],
+  ['Reskrim Kalbar 03','Olah TKP Sanggau','Aktif','Sedang'],
+  ['Intel Sulteng 02','Monitoring Poso','Aktif','Tinggi'],
+  ['Brimob Malut 05','Siaga Ternate','Siaga','Rendah'],
 ];
 
 function escapeHtml(value) {
@@ -115,7 +115,9 @@ function setHeader(id) {
 }
 
 function kpi(icon, label, value, sub, cls = '') {
-  return `<div class="card kpi ${cls}"><div class="kpi-icon">${icon}</div><div><label>${label}</label><strong>${value}</strong><span>${sub}</span></div></div>`;
+  // Diselaraskan ke gaya "Situasi Nasional": jika sub diawali panah tren, tampilkan sebagai delta.
+  const isDelta = /^[↑↓]/.test(sub || '');
+  return statCard(icon, label, value, isDelta ? sub : '', isDelta ? '' : sub, cls);
 }
 
 function feedCards() {
@@ -376,9 +378,9 @@ function renderKriminal() {
 
 function renderKorelasi() {
   const cards = [
-    ['INT-001 Potensi Tawuran', 'LP-021 Tawuran Manggarai', '86%', 'Lokasi sama, kategori sama, rentang waktu 12 jam, kata kunci kelompok cocok.'],
-    ['INT-014 Peredaran Narkoba', 'LP-011 Penangkapan Cilandak', '77%', 'Radius 800 meter, sumber A1, modus sesuai catatan intelijen.'],
-    ['INT-008 Isu Curanmor', 'LP-009 Curanmor Kebayoran Lama', '62%', 'Pola jam malam dan wilayah berdekatan, perlu pendalaman entitas.'],
+    ['INT-014 Kelompok Bersenjata', 'LP-021 Gangguan Kamtibmas Papua', '86%', 'Lokasi sama, kategori sama, rentang waktu 12 jam, kata kunci kelompok cocok.'],
+    ['INT-002 Potensi Unjuk Rasa', 'LP-011 Kerusuhan Makassar', '77%', 'Radius 800 meter, sumber A1, modus sesuai catatan intelijen.'],
+    ['INT-001 Aktivitas Lintas Batas', 'LP-009 Penyelundupan Kalbar', '62%', 'Pola jam malam dan wilayah berdekatan, perlu pendalaman entitas.'],
   ];
   return `<div class="grid">
     <div class="grid cols-3">${kpi('⌁','Korelasi Ditemukan','18','6 prioritas tinggi')}${kpi('◎','Akurasi Intelijen','74%','Berdasarkan data terkait','purple')}${kpi('⚠','Butuh Pendalaman','9','Entitas belum lengkap','amber')}</div>
@@ -389,10 +391,10 @@ function renderKorelasi() {
 
 function renderMasyarakat() {
   const rows = [
-    ['MAS-001','03 Jul 2026 10:08','Anonim','Manggarai','Kerumunan mencurigakan','Foto','Baru'],
-    ['MAS-002','03 Jul 2026 08:55','Terverifikasi','Pasar Minggu','Balap liar','Video','Terverifikasi'],
-    ['MAS-003','02 Jul 2026 22:22','Anonim','Tebet','Keributan warga','Tidak ada','Dipantau'],
-    ['MAS-004','02 Jul 2026 19:44','Terverifikasi','Cilandak','Dugaan transaksi narkoba','Foto','Diteruskan'],
+    ['MAS-001','03 Jul 2026 10:08','Anonim','Sanggau, Kalbar','Aktivitas mencurigakan lintas batas','Foto','Baru'],
+    ['MAS-002','03 Jul 2026 08:55','Terverifikasi','Jayapura, Papua','Gangguan keamanan lokal','Video','Terverifikasi'],
+    ['MAS-003','02 Jul 2026 22:22','Anonim','Ambon, Maluku','Keributan antarwarga','Tidak ada','Dipantau'],
+    ['MAS-004','02 Jul 2026 19:44','Terverifikasi','Makassar, Sulsel','Dugaan transaksi narkoba','Foto','Diteruskan'],
   ];
   return `<div class="page-layout"><div class="panel"><div class="panel-header"><h3>Laporan Masyarakat</h3><a>Moderasi</a></div><div class="filter-bar"><button class="chip active">Semua</button><button class="chip">Anonim</button><button class="chip">Terverifikasi</button><button class="chip">Dengan Lampiran</button><button class="chip">Prioritas</button></div>${table(['ID','Waktu','Pelapor','Lokasi','Kategori','Lampiran','Status'], rows)}</div><div class="grid"><div class="panel"><div class="panel-header"><h3>Moderasi Cepat</h3></div><div class="stat-stack"><div class="mini-stat"><span>Menunggu verifikasi</span><b>27</b></div><div class="mini-stat"><span>Anonim aktif</span><b>14</b></div><div class="mini-stat"><span>Dengan bukti</span><b>33</b></div><div class="mini-stat"><span>Diteruskan ke unit</span><b>12</b></div></div></div>${timelinePanel()}</div></div>`;
 }
@@ -404,8 +406,8 @@ function renderPanic() {
     </div>
     <div class="page-layout">
       <div class="panel"><div class="panel-header"><h3>Insiden Darurat Aktif</h3><a>Mode Operator</a></div><div class="grid cols-2">
-        <div class="emergency-card"><h4>PANIC-0703-001 ${badge('Kritis')}</h4><p>Pelapor anonim • Manggarai • Lokasi bergerak aktif • Audio izin darurat aktif</p><div class="response-timer">00:04:18</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn small primary">Tugaskan Unit</button><button class="btn small danger">Hubungi</button><button class="btn small ghost">Lihat Lokasi</button></div></div>
-        <div class="emergency-card"><h4>PANIC-0703-002 ${badge('Tinggi')}</h4><p>Pelapor terverifikasi • Pasar Minggu • Foto terlampir • Butuh validasi operator</p><div class="response-timer">00:08:51</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn small primary">Tugaskan Unit</button><button class="btn small ghost">Lihat Lokasi</button></div></div>
+        <div class="emergency-card"><h4>PANIC-0703-001 ${badge('Kritis')}</h4><p>Pelapor anonim • Jayapura, Papua • Lokasi bergerak aktif • Audio izin darurat aktif</p><div class="response-timer">00:04:18</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn small primary">Tugaskan Unit</button><button class="btn small danger">Hubungi</button><button class="btn small ghost">Lihat Lokasi</button></div></div>
+        <div class="emergency-card"><h4>PANIC-0703-002 ${badge('Tinggi')}</h4><p>Pelapor terverifikasi • Sanggau, Kalbar • Foto terlampir • Butuh validasi operator</p><div class="response-timer">00:08:51</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn small primary">Tugaskan Unit</button><button class="btn small ghost">Lihat Lokasi</button></div></div>
       </div></div>
       <div class="grid">${globePanel('panicGlobeCanvas')}<div class="panel"><div class="panel-header"><h3>Protokol Privasi</h3></div><p class="panel-subtitle">Lokasi real-time, mikrofon, dan lampiran hanya aktif berdasarkan izin pengguna serta harus tercatat di audit log.</p></div></div>
     </div>
@@ -423,7 +425,7 @@ function renderAnalitik() {
   return `<div class="grid">
     <div class="grid cols-4">${kpi('◎','Skor Risiko Kota','72','Status Tinggi','amber')}${kpi('↗','Tren 7 Hari','↑ 18%','Naik signifikan','red')}${kpi('⌁','Anomali Terdeteksi','5','Butuh analisis')}${kpi('◈','Prediksi 24 Jam','8 area','Prioritas patroli','purple')}</div>
     <div class="grid cols-2">${chartPanel('Prediksi Risiko 7 Hari')}${chartPanel('Anomali Laporan per Jam')}</div>
-    <div class="grid cols-3"><div class="panel"><div class="panel-header"><h3>Early Warning</h3></div><div class="stat-stack"><div class="mini-stat"><span>Manggarai</span><b>89</b></div><div class="mini-stat"><span>Cilandak</span><b>78</b></div><div class="mini-stat"><span>Kebayoran Lama</span><b>74</b></div></div></div><div class="panel"><div class="panel-header"><h3>Faktor Risiko</h3></div><div class="stat-stack"><div class="mini-stat"><span>Frekuensi laporan</span><b>30%</b></div><div class="mini-stat"><span>Kejadian aktual</span><b>28%</b></div><div class="mini-stat"><span>Validitas intelijen</span><b>22%</b></div></div></div><div class="panel"><div class="panel-header"><h3>Rekomendasi Sistem</h3></div><div class="alert-list"><div class="alert-item"><span class="pulse red"></span><b>Tambah patroli Manggarai pukul 21.00-01.00</b><span>1</span></div><div class="alert-item"><span class="pulse amber"></span><b>Validasi laporan Cilandak</b><span>2</span></div></div></div></div>
+    <div class="grid cols-3"><div class="panel"><div class="panel-header"><h3>Early Warning</h3></div><div class="stat-stack"><div class="mini-stat"><span>Papua</span><b>92</b></div><div class="mini-stat"><span>Kalimantan Barat</span><b>84</b></div><div class="mini-stat"><span>Poso, Sulteng</span><b>78</b></div></div></div><div class="panel"><div class="panel-header"><h3>Faktor Risiko</h3></div><div class="stat-stack"><div class="mini-stat"><span>Frekuensi laporan</span><b>30%</b></div><div class="mini-stat"><span>Kejadian aktual</span><b>28%</b></div><div class="mini-stat"><span>Validitas intelijen</span><b>22%</b></div></div></div><div class="panel"><div class="panel-header"><h3>Rekomendasi Sistem</h3></div><div class="alert-list"><div class="alert-item"><span class="pulse red"></span><b>Perkuat patroli perbatasan Papua pukul 21.00-03.00</b><span>1</span></div><div class="alert-item"><span class="pulse amber"></span><b>Validasi laporan siber nasional</b><span>2</span></div></div></div></div>
   </div>`;
 }
 
@@ -433,10 +435,10 @@ function renderWilayah() {
 
 function renderDokumen() {
   const docs = [
-    ['Laporan Intelijen Mingguan Wilayah Selatan','Rahasia • 03 Jul 2026 • 24 halaman','Kasat Intelkam, Analis'],
-    ['Analisis Korelasi Tawuran Manggarai','Terbatas • 02 Jul 2026 • 11 halaman','Pimpinan, Operator'],
-    ['Profil Risiko Cilandak','Terbatas • 01 Jul 2026 • 16 halaman','Analis, Polsek'],
-    ['Rekap Kriminal Bulanan','Internal • 30 Jun 2026 • 32 halaman','Semua role terkait'],
+    ['Laporan Intelijen Mingguan Nasional','Rahasia • 03 Jul 2026 • 24 halaman','Kabaintelkam, Analis'],
+    ['Analisis Korelasi Gangguan Keamanan Papua','Terbatas • 02 Jul 2026 • 11 halaman','Pimpinan, Operator'],
+    ['Profil Risiko Perbatasan Kalbar','Terbatas • 01 Jul 2026 • 16 halaman','Analis, Polda'],
+    ['Rekap Kamtibmas Nasional Bulanan','Internal • 30 Jun 2026 • 32 halaman','Semua role terkait'],
   ];
   return `<div class="page-layout"><div class="panel"><div class="panel-header"><h3>Secure Document Vault</h3><a>Upload Dokumen</a></div><div class="doc-list">${docs.map(d => `<div class="doc-row"><h4>${d[0]}</h4><p>${d[1]}</p><p>Akses: ${d[2]}</p><div style="margin-top:10px"><button class="btn small primary">Buka</button> <button class="btn small ghost">Watermark</button> <button class="btn small ghost">Riwayat</button></div></div>`).join('')}</div></div><div class="grid"><div class="panel"><div class="panel-header"><h3>Keamanan Dokumen</h3></div><div class="stat-stack"><div class="mini-stat"><span>Watermark aktif</span><b>Ya</b></div><div class="mini-stat"><span>Download dibatasi</span><b>Ya</b></div><div class="mini-stat"><span>Audit akses</span><b>100%</b></div><div class="mini-stat"><span>Enkripsi</span><b>AES</b></div></div></div>${timelinePanel()}</div></div>`;
 }
@@ -454,7 +456,7 @@ function renderPengguna() {
 function renderAudit() {
   const audit = [
     ['03 Jul 2026 10:22','Bripka Satria','Update status PANIC-0703-001','Panic Button','Berhasil'],
-    ['03 Jul 2026 10:18','Analis Nadia','Membuka dokumen analisis Manggarai','Dokumen','Berhasil'],
+    ['03 Jul 2026 10:18','Analis Nadia','Membuka dokumen analisis Papua','Dokumen','Berhasil'],
     ['03 Jul 2026 10:11','Admin Sistem','Mengubah hak akses operator','Pengguna','Berhasil'],
     ['03 Jul 2026 09:55','User tidak dikenal','Percobaan akses dokumen rahasia','Dokumen','Ditolak'],
     ['03 Jul 2026 09:41','AKP Pratama','Export ringkasan wilayah','Beranda','Berhasil'],
@@ -463,7 +465,7 @@ function renderAudit() {
 }
 
 function renderPengaturan() {
-  return `<div class="grid cols-2"><div class="panel"><div class="panel-header"><h3>Konfigurasi Sistem</h3></div><div class="form-grid"><div class="input-group"><label>Nama Instansi</label><input value="Polres Metro Jakarta Selatan" /></div><div class="input-group"><label>Zona Waktu</label><select><option>Asia/Jakarta - WIB</option></select></div><div class="input-group"><label>Mode Dashboard</label><select><option>Real-time</option><option>Simulasi</option><option>Maintenance</option></select></div><div class="input-group"><label>Default Radius Korelasi</label><input value="1500 meter" /></div><button class="btn primary">Simpan Pengaturan</button></div></div><div class="panel"><div class="panel-header"><h3>Integrasi Data</h3></div><div class="stat-stack"><div class="mini-stat"><span>Laporan Intelijen Lama</span><b>Aktif</b></div><div class="mini-stat"><span>Database Kriminal</span><b>Aktif</b></div><div class="mini-stat"><span>Android Panic Button</span><b>Aktif</b></div><div class="mini-stat"><span>OSINT Monitoring</span><b>Draft</b></div><div class="mini-stat"><span>GIS / Map Service</span><b>Aktif</b></div></div></div><div class="panel"><div class="panel-header"><h3>Keamanan</h3></div><div class="layer-grid"><label>Multi Factor Authentication<input type="checkbox" checked></label><label>Watermark Dokumen<input type="checkbox" checked></label><label>Masking Identitas Pelapor<input type="checkbox" checked></label><label>Pembatasan Export<input type="checkbox" checked></label><label>Audit Log Wajib<input type="checkbox" checked></label></div></div><div class="panel"><div class="panel-header"><h3>Skema Tingkat Ancaman</h3></div><div class="stat-stack"><div class="mini-stat"><span>0-30</span><b>Rendah</b></div><div class="mini-stat"><span>31-60</span><b>Sedang</b></div><div class="mini-stat"><span>61-80</span><b>Tinggi</b></div><div class="mini-stat"><span>81-100</span><b>Kritis</b></div></div></div></div>`;
+  return `<div class="grid cols-2"><div class="panel"><div class="panel-header"><h3>Konfigurasi Sistem</h3></div><div class="form-grid"><div class="input-group"><label>Nama Instansi</label><input value="Mabes Polri — Baintelkam" /></div><div class="input-group"><label>Zona Waktu</label><select><option>Asia/Jakarta - WIB</option></select></div><div class="input-group"><label>Mode Dashboard</label><select><option>Real-time</option><option>Simulasi</option><option>Maintenance</option></select></div><div class="input-group"><label>Default Radius Korelasi</label><input value="1500 meter" /></div><button class="btn primary">Simpan Pengaturan</button></div></div><div class="panel"><div class="panel-header"><h3>Integrasi Data</h3></div><div class="stat-stack"><div class="mini-stat"><span>Laporan Intelijen Lama</span><b>Aktif</b></div><div class="mini-stat"><span>Database Kriminal</span><b>Aktif</b></div><div class="mini-stat"><span>Android Panic Button</span><b>Aktif</b></div><div class="mini-stat"><span>OSINT Monitoring</span><b>Draft</b></div><div class="mini-stat"><span>GIS / Map Service</span><b>Aktif</b></div></div></div><div class="panel"><div class="panel-header"><h3>Keamanan</h3></div><div class="layer-grid"><label>Multi Factor Authentication<input type="checkbox" checked></label><label>Watermark Dokumen<input type="checkbox" checked></label><label>Masking Identitas Pelapor<input type="checkbox" checked></label><label>Pembatasan Export<input type="checkbox" checked></label><label>Audit Log Wajib<input type="checkbox" checked></label></div></div><div class="panel"><div class="panel-header"><h3>Skema Tingkat Ancaman</h3></div><div class="stat-stack"><div class="mini-stat"><span>0-30</span><b>Rendah</b></div><div class="mini-stat"><span>31-60</span><b>Sedang</b></div><div class="mini-stat"><span>61-80</span><b>Tinggi</b></div><div class="mini-stat"><span>81-100</span><b>Kritis</b></div></div></div></div>`;
 }
 
 const renderers = {
