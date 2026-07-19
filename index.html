@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="SI-INTELPOL — prototipe dashboard intelijen kepolisian terintegrasi (UI/UX konsep, data simulasi)." />
-  <title>SI-INTELPOL | Dashboard Intelijen Kepolisian</title>
+  <meta name="description" content="Sistem Informasi Intelijen — prototipe dashboard situasi nasional (UI/UX konsep, data simulasi)." />
+  <title>Sistem Informasi Intelijen | Dashboard Situasi Nasional</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23081727'/%3E%3Ctext x='32' y='42' font-family='Segoe UI,Arial,sans-serif' font-size='28' font-weight='700' fill='%2329d7ff' text-anchor='middle'%3ESI%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,7 +12,7 @@
   <div class="auth-gate" id="authGate">
     <form class="auth-card" id="authForm" autocomplete="off">
       <div class="auth-logo">SI</div>
-      <h1>SI-INTELPOL</h1>
+      <h1>Sistem Informasi Intelijen</h1>
       <p>Masukkan kode akses untuk membuka dashboard prototipe.</p>
       <input id="authCode" type="password" inputmode="text" placeholder="Kode akses" aria-label="Kode akses" autocomplete="off" />
       <button type="submit" class="btn primary auth-submit">Masuk</button>
@@ -22,49 +22,56 @@
   </div>
 
   <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-logo">SI</div>
-        <div>
-          <h1>SI-INTELPOL</h1>
-          <span>Integrated Intelligence</span>
+    <div class="brand-cell">
+      <button class="icon-button mobile-toggle" id="mobileToggle" aria-label="Buka menu">☰</button>
+      <div class="emblem" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="44" height="44">
+          <circle cx="24" cy="24" r="21" fill="#0b1c30" stroke="#e8c15a" stroke-width="2"/>
+          <path d="M24 11 l1.6 3.4 -1.6 -.9 -1.6 .9 z" fill="#e8c15a"/>
+          <path d="M24 15 C18 15 12 18.5 8 25.5 C15 23.5 20 23.5 24 29.5 C28 23.5 33 23.5 40 25.5 C36 18.5 30 15 24 15 Z" fill="#e8c15a"/>
+          <path d="M20.5 28.5 h7 l-1 6 -2.5 2.6 -2.5 -2.6 z" fill="#e8c15a"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Sistem Informasi Intelijen</h1>
+        <span>Dashboard Situasi Nasional</span>
+      </div>
+    </div>
+
+    <header class="topbar">
+      <div class="search-wrap">
+        <span>⌕</span>
+        <input id="globalSearch" type="search" placeholder="Cari laporan, lokasi, atau kata kunci..." />
+      </div>
+      <div class="top-actions">
+        <div class="datetime">
+          <small id="dateText">Jumat, 3 Juli 2026</small>
+          <strong id="timeText">00:00:00 WIB</strong>
+        </div>
+        <button class="icon-button badge" title="Notifikasi" aria-label="Notifikasi">🔔<span>12</span></button>
+        <button class="icon-button" title="Pesan" aria-label="Pesan">✉</button>
+        <div class="profile">
+          <div class="avatar">A</div>
+          <div class="profile-name">
+            <strong>Admin Intelijen</strong>
+            <small>Administrator</small>
+          </div>
+          <span class="profile-caret">▾</span>
         </div>
       </div>
+    </header>
 
-      <nav class="nav" id="navMenu"></nav>
+    <aside class="sidebar" id="sidebar">
+      <nav class="nav" id="navMenu" aria-label="Navigasi utama"></nav>
 
       <div class="system-mini">
-        <div class="mini-row"><span class="pulse green"></span><span>Status Sistem</span><b>Aman</b></div>
-        <div class="mini-row"><span class="pulse cyan"></span><span>Koneksi</span><b>Terhubung</b></div>
-        <div class="mini-row"><span class="pulse amber"></span><span>Mode</span><b>Simulasi</b></div>
-        <small>Ver. 1.0.0 • Prototype</small>
+        <div class="sys-block"><label>STATUS SISTEM</label><div class="sys-val"><span class="pulse green"></span>Aman</div></div>
+        <div class="sys-block"><label>KONEKSI</label><div class="sys-val"><span class="pulse cyan"></span>Terhubung <i class="wifi">▮▮▮</i></div></div>
+        <div class="sys-block"><label>SISTEM TERINTEGRASI</label><div class="sys-ver">VER. 2.5.1.280525</div></div>
       </div>
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <button class="icon-button mobile-toggle" id="mobileToggle">☰</button>
-        <div class="search-wrap">
-          <span>⌕</span>
-          <input id="globalSearch" type="search" placeholder="Cari laporan, wilayah, kategori, entitas, atau kata kunci..." />
-        </div>
-        <div class="top-actions">
-          <div class="datetime">
-            <small id="dateText">Jumat, 3 Juli 2026</small>
-            <strong id="timeText">00:00:00 WIB</strong>
-          </div>
-          <button class="icon-button badge" title="Notifikasi">🔔<span>12</span></button>
-          <button class="icon-button" title="Pesan">✉</button>
-          <div class="profile">
-            <div class="avatar">A</div>
-            <div>
-              <strong>Admin Intelijen</strong>
-              <small>Administrator</small>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <section class="content-header">
         <div>
           <p class="eyebrow" id="pageEyebrow">Command Center</p>

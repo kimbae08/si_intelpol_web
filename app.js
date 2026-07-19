@@ -17,10 +17,10 @@ const menuItems = [
 ];
 
 const latest = [
-  { sev:'KRITIS', cls:'s-critical', time:'10:15 WIB', title:'Potensi tawuran di wilayah Manggarai', body:'Intelijen lapangan mendeteksi pengumpulan massa remaja.', status:'Perlu verifikasi' },
-  { sev:'TINGGI', cls:'s-high', time:'09:40 WIB', title:'Curanmor terjadi di Kebayoran Lama', body:'Laporan kriminal aktual masuk dari unit patroli.', status:'Dalam penanganan' },
-  { sev:'SEDANG', cls:'s-mid', time:'09:12 WIB', title:'Isu provokatif meningkat di media sosial', body:'OSINT menandai 18 unggahan dengan pola ajakan berkumpul.', status:'Monitoring' },
-  { sev:'RENDAH', cls:'s-low', time:'08:55 WIB', title:'Laporan warga terkait balap liar', body:'Lokasi berulang di jalan arteri pada malam hari.', status:'Terverifikasi' },
+  { sev:'KRITIS', cls:'s-critical', time:'10:15 WIB', title:'Aktivitas Mencurigakan di Perbatasan Kalbar', body:'Sanggau, Kalimantan Barat', status:'Verified', st:'green' },
+  { sev:'TINGGI', cls:'s-high', time:'09:47 WIB', title:'Potensi Unjuk Rasa di Beberapa Titik', body:'Jakarta, Jawa Barat, Banten', status:'Monitoring', st:'blue' },
+  { sev:'SEDANG', cls:'s-mid', time:'09:20 WIB', title:'Peningkatan Aktivitas di Ruang Siber', body:'Indonesia', status:'Under Review', st:'amber' },
+  { sev:'RENDAH', cls:'s-low', time:'08:55 WIB', title:'Informasi Gangguan Keamanan Lokal', body:'Jayapura, Papua', status:'Verified', st:'green' },
 ];
 
 const intelRows = [
@@ -38,11 +38,11 @@ const crimeRows = [
 ];
 
 const timeline = [
-  ['10:15','Laporan intelijen masuk','Potensi tawuran di Manggarai, status perlu verifikasi.'],
-  ['09:40','Kejadian kriminal tercatat','Curanmor dilaporkan di Kebayoran Lama.'],
-  ['09:12','OSINT menaikkan sinyal risiko','Isu provokatif meningkat pada kanal publik.'],
-  ['08:55','Laporan warga diverifikasi','Balap liar di arteri masuk kategori sedang.'],
-  ['08:30','Unit patroli diperbarui','Tiga unit diarahkan ke area prioritas.'],
+  ['10:15','Laporan baru diterima','Aktivitas mencurigakan di perbatasan Kalbar.'],
+  ['09:47','Tingkat ancaman dinaikkan','Situasi di Jakarta dan sekitarnya.'],
+  ['09:20','Laporan siber diverifikasi','Peningkatan aktivitas scanning IP.'],
+  ['08:55','Informasi lokal diverifikasi','Gangguan keamanan di Jayapura.'],
+  ['08:30','Operasi intelijen diperbarui','Penugasan lapangan di 3 wilayah.'],
 ];
 
 const areaData = [
@@ -121,7 +121,7 @@ function kpi(icon, label, value, sub, cls = '') {
 function feedCards() {
   return latest.map(f => `<article class="feed-card">
     <div class="feed-meta"><span class="severity ${f.cls}">${f.sev}</span><span>${f.time}</span></div>
-    <h4>${f.title}</h4><p>${f.body}</p><span class="status-dot">${f.status}</span>
+    <h4>${f.title}</h4><p>${f.body}</p><span class="status-dot ${f.st || ''}">${f.status}</span>
   </article>`).join('');
 }
 
@@ -171,27 +171,149 @@ function table(headers, rows) {
   return `<div class="table-wrap"><table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((c, i) => `<td>${i > 3 ? badge(c) : c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
+function statCard(icon, label, value, delta, sub, tone = '') {
+  return `<div class="stat-card ${tone}">
+    <div class="stat-icon">${icon}</div>
+    <div>
+      <span class="stat-label">${label}</span>
+      <div class="stat-value">${value}${delta ? `<em class="stat-delta">${delta}</em>` : ''}</div>
+      <span class="stat-sub">${sub}</span>
+    </div>
+  </div>`;
+}
+
+function situationPanel() {
+  const cards = latest.map(f => `<article class="sit-card">
+    <div class="sit-top"><span class="severity ${f.cls}">${f.sev}</span><span class="sit-time">${f.time}</span><span class="sit-kebab">⋮</span></div>
+    <h4>${f.title}</h4><p>${f.body}</p>
+    <span class="status-dot ${f.st || ''}">${f.status}</span>
+  </article>`).join('');
+  return `<div class="panel situation-panel">
+    <div class="feed-strip">
+      <div class="panel-header"><h3>Informasi Terbaru</h3><a>Lihat Semua</a></div>
+      <div class="feed-scroller">${cards}</div>
+    </div>
+    <div class="globe-wrap">
+      <div class="map-controls"><button class="active" title="Globe">◍</button><button title="Layer">▤</button><button title="Titik">⌖</button><button title="Layar penuh">⛶</button></div>
+      <canvas id="globeCanvas" class="globe-canvas"></canvas>
+      <div class="zoom-controls"><button>+</button><button>−</button><button>↻</button></div>
+      <div class="activity-legend"><span>Tingkat Aktivitas</span><small>Rendah</small><i class="grad"></i><small>Kritis</small></div>
+    </div>
+  </div>`;
+}
+
+function indoMapCard() {
+  return `<div class="panel indo-card">
+    <div class="panel-header"><h3>Tren 24 Jam</h3><span class="mini-select">Laporan ▾</span></div>
+    <div class="indo-wrap"><canvas id="indoCanvas" class="indo-canvas"></canvas></div>
+    <div class="indo-legend">
+      <span><i style="background:var(--blue)"></i>Rendah</span>
+      <span><i style="background:var(--amber)"></i>Sedang</span>
+      <span><i style="background:var(--red)"></i>Tinggi</span>
+      <span><i style="background:var(--purple)"></i>Kritis</span>
+    </div>
+  </div>`;
+}
+
+function categoryCard() {
+  const segs = [
+    ['Keamanan','2.987','38.1%','var(--blue)'],
+    ['Politik','1.823','23.3%','var(--cyan)'],
+    ['Sosial','1.356','17.3%','var(--green)'],
+    ['Ekonomi','892','11.4%','var(--amber)'],
+    ['Bencana Alam','784','10.0%','var(--red)'],
+  ];
+  const gradient = 'conic-gradient(var(--blue) 0 38.1%, var(--cyan) 38.1% 61.4%, var(--green) 61.4% 78.7%, var(--amber) 78.7% 90.1%, var(--red) 90.1% 100%)';
+  return `<div class="panel cat-card">
+    <div class="panel-header"><h3>Kategori Laporan</h3></div>
+    <div class="cat-body">
+      <div class="donut" style="background:${gradient}"></div>
+      <ul class="cat-legend">${segs.map(s => `<li><span class="dot" style="background:${s[3]}"></span><div><b>${s[0]}</b><small>${s[1]} (${s[2]})</small></div></li>`).join('')}</ul>
+    </div>
+  </div>`;
+}
+
+function trendCard() {
+  // Tren laporan 7 hari terakhir (skala 0-2000). Titik: nilai harian.
+  const vals = [1050, 1300, 1150, 950, 1200, 1000, 1248];
+  const days = ['15 Mei','16 Mei','17 Mei','18 Mei','19 Mei','20 Mei','21 Mei'];
+  const x = (i) => 58 + i * 78;
+  const y = (v) => 200 - (v / 2000) * 170;
+  const linePts = vals.map((v, i) => `${x(i)} ${y(v).toFixed(1)}`);
+  const line = 'M' + linePts.join(' L');
+  const area = `${line} L${x(6)} 200 L${x(0)} 200 Z`;
+  const dots = vals.map((v, i) => `<circle cx="${x(i)}" cy="${y(v).toFixed(1)}" r="4"/>`).join('');
+  const gy = [[2000,30],[1500,72.5],[1000,115],[500,157.5],[0,200]];
+  const grid = gy.map(g => `M52 ${g[1]} H544`).join(' ');
+  const yLabels = [['2K',30],['1.5K',72.5],['1K',115],['500',157.5],['0',200]]
+    .map(l => `<text class="yl" x="46" y="${l[1] + 4}" text-anchor="end">${l[0]}</text>`).join('');
+  const xLabels = days.map((d, i) => `<text class="xl" x="${x(i)}" y="222">${d}</text>`).join('');
+  const lx = x(6), ly = y(1248);
+  return `<div class="panel trend-card">
+    <div class="panel-header"><h3>Trend Laporan <span class="subttl">(7 Hari Terakhir)</span></h3><a>Analisis</a></div>
+    <svg viewBox="0 0 560 232" class="line-chart trend-svg" aria-label="Trend laporan 7 hari terakhir">
+      <defs><linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="rgba(64,156,255,.42)"/><stop offset="100%" stop-color="rgba(64,156,255,0)"/>
+      </linearGradient></defs>
+      <path class="grid-line" d="${grid}" />
+      ${yLabels}${xLabels}
+      <path class="area" d="${area}" />
+      <path class="line" d="${line}" />
+      <g class="dots">${dots}</g>
+      <g class="trend-tip" transform="translate(${lx}, ${ly})">
+        <rect x="-40" y="-50" width="80" height="38" rx="8"/>
+        <text class="tv" x="0" y="-32">1.248</text>
+        <text class="td" x="0" y="-18">21 Mei</text>
+      </g>
+    </svg>
+  </div>`;
+}
+
+function alertsCard() {
+  const rows = [['Kritis','3','red'],['Tinggi','7','orange'],['Sedang','14','amber'],['Rendah','23','green']];
+  return `<div class="panel"><div class="panel-header"><h3>Alerts</h3><a>Lihat Semua</a></div>
+    <div class="alert-list">${rows.map(r => `<div class="alert-row ${r[2]}"><span class="dot"></span><b>${r[0]}</b><span class="count">${r[1]}</span><span class="chev">›</span></div>`).join('')}</div></div>`;
+}
+
+function timelineNationalPanel() {
+  return `<div class="panel"><div class="panel-header"><h3>Timeline Aktivitas</h3><a>Lihat Semua</a></div>
+    <div class="timeline-list">${timeline.map(t => `<div class="timeline-item"><div class="timeline-time">${t[0]}</div><div><h4>${t[1]}</h4><p>${t[2]}</p></div></div>`).join('')}</div></div>`;
+}
+
+function topAreaCard() {
+  const areas = [
+    ['Papua','Tinggi','842','tinggi'],
+    ['Kalbar','Tinggi','621','tinggi'],
+    ['Poso, Sulteng','Tinggi','512','tinggi'],
+    ['Maluku Utara','Sedang','398','sedang'],
+    ['Jakarta','Sedang','287','sedang'],
+  ];
+  const max = 842;
+  return `<div class="panel"><div class="panel-header"><h3>Top Area Prioritas</h3></div>
+    <div class="top-area-list">${areas.map(a => `<div class="ta-row"><span class="ta-name">${a[0]}</span><span class="ta-level ${a[3]}">${a[1]}</span><div class="ta-bar"><span class="${a[3]}" style="width:${Math.round(a[2] / max * 100)}%"></span></div><span class="ta-val">${a[2]}</span></div>`).join('')}</div>
+    <a class="ta-more">Lihat Semua Area</a></div>`;
+}
+
 function renderBeranda() {
-  return `<div class="grid dashboard-grid">
-    <div class="grid">
-      ${kpi('▤','Total Laporan','7.842','↑ 12.6% dari 24 jam')}
-      ${kpi('⚠','Tingkat Ancaman','Tinggi','Trend meningkat','red')}
-      ${kpi('⌖','Area Prioritas','12','Dari 34 provinsi','purple')}
-      ${kpi('◉','Pelapor Aktif','1.248','↑ 8.3% hari ini','amber')}
+  return `<div class="national-grid">
+    <div class="col-stack">
+      ${statCard('▤','Total Laporan','7.842','↑ 12.6%','Dari 24 jam terakhir','blue')}
+      ${statCard('⛨','Tingkat Ancaman','Tinggi','↑','Trend meningkat','red')}
+      ${statCard('⌖','Area Prioritas','12','','Dari 34 provinsi','purple')}
+      ${statCard('◉','Pelapor Aktif','1.248','↑ 8.3%','Dalam 24 jam terakhir','teal')}
+      ${indoMapCard()}
     </div>
-    <div class="grid">
-      <div class="panel"><div class="panel-header"><h3>Informasi Terbaru</h3><a>Lihat Semua</a></div><div class="feed-row">${feedCards()}</div></div>
-      ${globePanel('globeCanvas')}
+    <div class="col-stack">
+      ${situationPanel()}
+      <div class="grid cols-2">
+        ${categoryCard()}
+        ${trendCard()}
+      </div>
     </div>
-    <div class="grid">
-      ${alertPanel()}
-      ${timelinePanel()}
-    </div>
-    <div class="grid bottom-grid" style="grid-column: 1 / -1">
-      ${chartPanel()}
-      <div class="panel"><div class="panel-header"><h3>Kategori Laporan</h3><a>Detail</a></div><div class="donut"></div><ul class="legend-list"><li><span class="pulse cyan"></span>Keamanan <b>38.1%</b></li><li><span class="pulse green"></span>Politik <b>23.3%</b></li><li><span class="pulse amber"></span>Sosial <b>17.3%</b></li><li><span class="pulse red"></span>Kriminal <b>21.3%</b></li></ul></div>
-      ${areaPanel()}
-      <div class="panel"><div class="panel-header"><h3>Status Unit</h3><a>Dispatch</a></div><div class="unit-list">${units.map(u => `<div class="unit-row"><h4>${u[0]} ${badge(u[3])}</h4><p>${u[1]} • ${u[2]}</p></div>`).join('')}</div></div>
+    <div class="col-stack">
+      ${alertsCard()}
+      ${timelineNationalPanel()}
+      ${topAreaCard()}
     </div>
   </div>`;
 }
@@ -364,6 +486,7 @@ const renderers = {
 
 function renderPage(id) {
   setHeader(id);
+  document.body.dataset.page = id;
   const content = document.getElementById('pageContent');
   content.innerHTML = renderers[id] ? renderers[id]() : renderBeranda();
   setTimeout(initCanvases, 50);
@@ -371,6 +494,7 @@ function renderPage(id) {
 
 function initCanvases() {
   document.querySelectorAll('canvas.globe-canvas').forEach((canvas, idx) => drawGlobe(canvas, idx));
+  document.querySelectorAll('canvas.indo-canvas').forEach((canvas) => drawIndoMap(canvas));
 }
 
 function drawGlobe(canvas, seed = 0) {
@@ -453,6 +577,73 @@ function drawArc(ctx, x1, y1, x2, y2, color) {
   ctx.strokeStyle = color;
   ctx.lineWidth = 1.2;
   ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo(mx,my,x2,y2); ctx.stroke();
+}
+
+// Peta Indonesia bergaya (heatmap 24 jam). Bentuk pulau disederhanakan sebagai elips.
+function drawIndoMap(canvas) {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(300, rect.width);
+  const h = Math.max(170, rect.height);
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  // Grid latar
+  ctx.strokeStyle = 'rgba(64,156,255,.06)';
+  ctx.lineWidth = 1;
+  for (let gx = 0; gx < w; gx += 34) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
+  for (let gy = 0; gy < h; gy += 34) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
+
+  // Pulau: [xFrac, yFrac, rxFrac, ryFrac, rotasi]
+  const islands = [
+    [0.15, 0.40, 0.11, 0.035, -0.6],  // Sumatra
+    [0.33, 0.66, 0.12, 0.020, -0.08], // Jawa
+    [0.42, 0.38, 0.10, 0.085, 0.05],  // Kalimantan
+    [0.57, 0.44, 0.045, 0.095, 0.35], // Sulawesi
+    [0.85, 0.52, 0.13, 0.085, 0.0],   // Papua
+    [0.52, 0.74, 0.05, 0.016, 0.0],   // Bali/NTB
+    [0.62, 0.76, 0.06, 0.016, 0.05],  // NTT
+    [0.69, 0.42, 0.02, 0.03, 0.2],    // Maluku Utara
+  ];
+  islands.forEach((is) => {
+    ctx.save();
+    ctx.translate(is[0] * w, is[1] * h);
+    ctx.rotate(is[4]);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, is[2] * w, is[3] * h, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(41,215,255,.10)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(41,215,255,.34)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Titik panas (heatmap): [xFrac, yFrac, warna, skala]
+  const hot = [
+    [0.30, 0.34, '#ff4d5f', 1.0],  // Kalbar
+    [0.85, 0.50, '#ff4d5f', 1.0],  // Papua
+    [0.33, 0.64, '#ff9346', 0.9],  // Jakarta
+    [0.57, 0.44, '#ffd15c', 0.85], // Poso/Sulteng
+    [0.69, 0.41, '#ffd15c', 0.8],  // Maluku Utara
+    [0.16, 0.42, '#29d7ff', 0.7],  // Sumatra
+    [0.44, 0.40, '#409cff', 0.7],  // Kalimantan
+    [0.52, 0.74, '#409cff', 0.6],  // NTB
+  ];
+  hot.forEach((p) => {
+    const x = p[0] * w, y = p[1] * h, color = p[2], s = p[3];
+    const rg = ctx.createRadialGradient(x, y, 0, x, y, 22 * s);
+    rg.addColorStop(0, color);
+    rg.addColorStop(0.4, color + 'aa');
+    rg.addColorStop(1, color + '00');
+    ctx.fillStyle = rg;
+    ctx.beginPath(); ctx.arc(x, y, 22 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x, y, 2 * s, 0, Math.PI * 2); ctx.fill();
+  });
 }
 
 function updateClock() {
