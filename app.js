@@ -581,7 +581,19 @@ function drawArc(ctx, x1, y1, x2, y2, color) {
   ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo(mx,my,x2,y2); ctx.stroke();
 }
 
-// Peta Indonesia bergaya (heatmap 24 jam). Bentuk pulau disederhanakan sebagai elips.
+// Titik panas heatmap 24 jam pada koordinat asli: [lon, lat, warna, skala]
+const INDO_HOTSPOTS = [
+  [110.60, 0.13, '#ff4d5f', 1.0],   // Sanggau, Kalbar
+  [140.70, -2.53, '#ff4d5f', 1.0],  // Jayapura, Papua
+  [106.83, -6.20, '#ff9346', 0.9],  // DKI Jakarta
+  [120.75, -1.40, '#ffd15c', 0.85], // Poso, Sulteng
+  [127.38, 0.79, '#ffd15c', 0.8],   // Ternate, Malut
+  [98.67, 3.59, '#29d7ff', 0.7],    // Deli Serdang, Sumut
+  [119.42, -5.15, '#409cff', 0.7],  // Makassar, Sulsel
+  [116.10, -8.58, '#409cff', 0.6],  // Nusa Tenggara
+];
+
+// Peta Indonesia dari GeoJSON asli (window.INDONESIA_GEO), proyeksi equirectangular.
 function drawIndoMap(canvas) {
   const rect = canvas.parentElement.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
@@ -599,52 +611,45 @@ function drawIndoMap(canvas) {
   for (let gx = 0; gx < w; gx += 34) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
   for (let gy = 0; gy < h; gy += 34) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
 
-  // Pulau: [xFrac, yFrac, rxFrac, ryFrac, rotasi]
-  const islands = [
-    [0.15, 0.40, 0.11, 0.035, -0.6],  // Sumatra
-    [0.33, 0.66, 0.12, 0.020, -0.08], // Jawa
-    [0.42, 0.38, 0.10, 0.085, 0.05],  // Kalimantan
-    [0.57, 0.44, 0.045, 0.095, 0.35], // Sulawesi
-    [0.85, 0.52, 0.13, 0.085, 0.0],   // Papua
-    [0.52, 0.74, 0.05, 0.016, 0.0],   // Bali/NTB
-    [0.62, 0.76, 0.06, 0.016, 0.05],  // NTT
-    [0.69, 0.42, 0.02, 0.03, 0.2],    // Maluku Utara
-  ];
-  islands.forEach((is) => {
-    ctx.save();
-    ctx.translate(is[0] * w, is[1] * h);
-    ctx.rotate(is[4]);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, is[2] * w, is[3] * h, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(41,215,255,.10)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(41,215,255,.34)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-    ctx.restore();
-  });
+  const geo = window.INDONESIA_GEO;
+  if (!geo || !geo.rings) return;
 
-  // Titik panas (heatmap): [xFrac, yFrac, warna, skala]
-  const hot = [
-    [0.30, 0.34, '#ff4d5f', 1.0],  // Kalbar
-    [0.85, 0.50, '#ff4d5f', 1.0],  // Papua
-    [0.33, 0.64, '#ff9346', 0.9],  // Jakarta
-    [0.57, 0.44, '#ffd15c', 0.85], // Poso/Sulteng
-    [0.69, 0.41, '#ffd15c', 0.8],  // Maluku Utara
-    [0.16, 0.42, '#29d7ff', 0.7],  // Sumatra
-    [0.44, 0.40, '#409cff', 0.7],  // Kalimantan
-    [0.52, 0.74, '#409cff', 0.6],  // NTB
-  ];
-  hot.forEach((p) => {
-    const x = p[0] * w, y = p[1] * h, color = p[2], s = p[3];
-    const rg = ctx.createRadialGradient(x, y, 0, x, y, 22 * s);
+  // Proyeksi equirectangular yang mempertahankan aspek rasio, di-fit ke canvas.
+  const [minLon, minLat, maxLon, maxLat] = geo.bbox;
+  const spanLon = maxLon - minLon, spanLat = maxLat - minLat;
+  const pad = 8;
+  const scale = Math.min((w - 2 * pad) / spanLon, (h - 2 * pad) / spanLat);
+  const offX = (w - spanLon * scale) / 2;
+  const offY = (h - spanLat * scale) / 2;
+  const projX = (lon) => offX + (lon - minLon) * scale;
+  const projY = (lat) => offY + (maxLat - lat) * scale;
+
+  // Gambar pulau
+  ctx.beginPath();
+  geo.rings.forEach((ring) => {
+    ring.forEach((pt, i) => {
+      const x = projX(pt[0]), y = projY(pt[1]);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+  });
+  ctx.fillStyle = 'rgba(41,215,255,.10)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(41,215,255,.32)';
+  ctx.lineWidth = 0.7;
+  ctx.stroke();
+
+  // Titik panas
+  INDO_HOTSPOTS.forEach((p) => {
+    const x = projX(p[0]), y = projY(p[1]), color = p[2], s = p[3];
+    const rg = ctx.createRadialGradient(x, y, 0, x, y, 20 * s);
     rg.addColorStop(0, color);
     rg.addColorStop(0.4, color + 'aa');
     rg.addColorStop(1, color + '00');
     ctx.fillStyle = rg;
-    ctx.beginPath(); ctx.arc(x, y, 22 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 20 * s, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(x, y, 2 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 1.8 * s, 0, Math.PI * 2); ctx.fill();
   });
 }
 

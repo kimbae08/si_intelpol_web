@@ -64,8 +64,13 @@ Navigasi memakai **hash routing** (`index.html#peta`, `#kriminal`, dst.), sehing
 si_intelpol_web/
 ├── index.html   # Kerangka halaman + template grafik (SVG)
 ├── styles.css   # Tema gelap/futuristik, layout & komponen
-└── app.js       # Data dummy, router hash, render halaman, globe canvas
+├── geo.js       # GeoJSON Indonesia (disederhanakan) untuk peta heatmap
+└── app.js       # Data dummy, router hash, render halaman, globe & peta canvas
 ```
+
+> Peta "Tren 24 Jam" digambar dari **GeoJSON provinsi Indonesia asli**
+> (disederhanakan dengan Douglas-Peucker jadi ~75 KB) memakai proyeksi
+> equirectangular; titik panas dipetakan pada koordinat lon/lat sebenarnya.
 
 ## 🔒 Catatan untuk implementasi nyata
 
